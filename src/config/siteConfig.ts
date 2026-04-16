@@ -13,11 +13,10 @@ export const siteConfig: SiteConfig = {
   subtitle: '个人博客网站',
 
   // 站点 URL
-  site_url: 'http://localhost:3000',
+  site_url: 'https://liushuai-man.github.io',
 
   // 站点描述
-  description:
-    '暂无',
+  description: '暂无',
 
   // 站点关键词
   keywords: [
