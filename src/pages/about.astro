@@ -5,6 +5,9 @@ import Markdown from "@components/common/Markdown.astro";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import Profile from "@/components/widget/Profile.astro";
+import SiteStats from "@/components/widget/SiteStats.astro";
+import Announcement from "@/components/widget/Announcement.astro";
 
 const aboutPost = await getEntry("spec", "about");
 
@@ -14,10 +17,33 @@ if (!aboutPost) {
 
 const { Content } = await render(aboutPost);
 ---
-<MainGridLayout title={i18n(I18nKey.about)} description={i18n(I18nKey.about)}>
+<style>
+    .about-profile-container {
+        max-width: 17.5rem; /* 与侧边栏宽度一致 */
+        margin: 0 auto;
+    }
+    
+    /* 移除之前的样式，让组件使用默认样式 */
+</style>
+<MainGridLayout title="关于" description="关于">
     <div class="flex w-full rounded-(--radius-large) overflow-hidden relative min-h-32">
         <div class="card-base z-10 px-9 py-6 relative w-full ">
-            <Markdown class="mt-2">
+            <div class="flex flex-col gap-6">
+                <div class="flex flex-col md:flex-row gap-6 items-start w-full">
+                    <div class="about-profile-container flex-shrink-0">
+                        <Profile />
+                    </div>
+                    <div class="flex-grow flex flex-col md:flex-row gap-6 min-w-0">
+                        <div class="about-stats-container flex-grow min-w-0">
+                            <SiteStats />
+                        </div>
+                        <div class="about-announcement-container flex-shrink-0 md:w-64">
+                            <Announcement />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <Markdown class="mt-8">
                 <Content />
             </Markdown>
         </div>

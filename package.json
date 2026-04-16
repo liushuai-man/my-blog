@@ -1,7 +1,7 @@
 {
-  "name": "firefly",
+  "name": "my-blog",
   "type": "module",
-  "version": "6.8.11",
+  "version": "0.0.0",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -41,9 +41,12 @@
     "astro": "6.0.8",
     "astro-expressive-code": "^0.41.7",
     "astro-icon": "^1.1.5",
+    "axios": "^1.15.0",
+    "cheerio": "^1.2.0",
     "dayjs": "^1.11.20",
     "expressive-code-collapsible": "^0.1.0",
     "expressive-code-language-badge": "^1.1.0",
+    "fs-extra": "^11.3.4",
     "glob": "^11.1.0",
     "gray-matter": "^4.0.3",
     "hastscript": "^9.0.1",
@@ -54,6 +57,7 @@
     "node-html-parser": "^7.0.2",
     "overlayscrollbars": "^2.14.0",
     "pagefind": "^1.4.0",
+    "path": "^0.12.7",
     "photoswipe": "^5.4.4",
     "qrcode": "^1.5.4",
     "reading-time": "^1.5.0",
@@ -71,6 +75,7 @@
     "sharp": "^0.34.5",
     "stylus": "^0.64.0",
     "svelte": "^5.53.11",
+    "turndown": "^7.2.4",
     "typescript": "^5.9.2",
     "unist-util-is": "^6.0.1",
     "unist-util-visit": "^5.1.0"

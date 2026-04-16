@@ -866,6 +866,8 @@ function disableAnimation() {
     window.swup.hooks.on("content:replace", () => {
       // 更新侧边栏组件的可见性（根据新页面的 URL）
       updateSidebarComponentsVisibility();
+      // 更新主网格布局
+      updateMainGridCols();
 
       // 只处理katex元素的容器，使用浏览器原生滚动条
       initCustomScrollbar();
@@ -1029,6 +1031,17 @@ function disableAnimation() {
       // 更新网格列数和侧边栏组件可见性
       updateMainGridCols();
       updateSidebarComponentsVisibility();
+
+      // 控制横幅文字可见性
+      const isHomePage = pathsEqual(window.location.pathname, url("/"));
+      const bannerTextOverlay = document.querySelector(".banner-home-text-overlay");
+      if (bannerTextOverlay) {
+        if (isHomePage) {
+          bannerTextOverlay.classList.remove("hidden");
+        } else {
+          bannerTextOverlay.classList.add("hidden");
+        }
+      }
 
       // hide the temp high element when the transition is done
       const heightExtend = document.getElementById("page-height-extend");
@@ -1255,6 +1268,18 @@ function disableAnimation() {
   function updateMainGridCols() {
     const mainGrid = document.getElementById("main-grid");
     if (!mainGrid) return;
+
+    const sidebarEnabled = mainGrid.getAttribute("data-sidebar-enabled") === "true";
+    if (!sidebarEnabled) {
+      // 侧边栏被禁用时，使用单列布局
+      mainGrid.classList.remove(
+        "md:grid-cols-[1fr_17.5rem]",
+        "md:grid-cols-[17.5rem_1fr]",
+        "xl:grid-cols-[17.5rem_1fr_17.5rem]"
+      );
+      mainGrid.classList.add("grid-cols-1");
+      return;
+    }
 
     const isPostPage = isCurrentPagePost();
     const sidebarPosition = mainGrid.getAttribute("data-sidebar-position") || "left";
