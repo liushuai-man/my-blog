@@ -18,13 +18,20 @@ jobs:
         with:
           node-version: 18
 
+      # ✅ 安装 pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      # ✅ 用 pnpm 安装依赖
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
 
+      # ✅ 构建
       - name: Build project
-        run: npm run build
+        run: pnpm build
 
-      - name: Deploy to GitHub Pages
+      # ✅ 部署
+      - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
