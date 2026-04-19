@@ -275,6 +275,26 @@ const remoteReferrerPolicy =
 </style>
 
 <script>
+	// 预加载封面图片，减少加载卡顿
+	function preloadCoverImages() {
+		const containers = document.querySelectorAll('.cover-image-container');
+		containers.forEach((container) => {
+			const img = container.querySelector('img[data-cover-img]') as HTMLImageElement | null;
+			if (img) {
+				// 预加载图片
+				const preloadImg = new Image();
+				preloadImg.src = img.src;
+			}
+
+			// 预加载回退图片
+			const fallbackImg = container.querySelector('.fallback-image img') as HTMLImageElement | null;
+			if (fallbackImg) {
+				const preloadFallbackImg = new Image();
+				preloadFallbackImg.src = fallbackImg.src;
+			}
+		});
+	}
+
 	function initCoverImages() {
 		const containers = document.querySelectorAll('.cover-image-container');
 		containers.forEach((container) => {
@@ -329,6 +349,19 @@ const remoteReferrerPolicy =
 		});
 	}
 
+	// 页面加载时预加载图片
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', preloadCoverImages);
+	} else {
+		preloadCoverImages();
+	}
+
+	// 页面切换时预加载图片
+	document.addEventListener('astro:page-load', () => {
+		preloadCoverImages();
+		initCoverImages();
+	});
+
+	// 初始化封面图片
 	initCoverImages();
-	document.addEventListener('astro:page-load', initCoverImages);
 </script>
