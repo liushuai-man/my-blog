@@ -3,7 +3,7 @@ title: 输入URL之后，都发生了什么？
 published: 2026-04-10
 description: '在浏览器中输入 URL 后，发生了哪些步骤？'
 tags: ['HTTP', 'URL', 'TCP']
-image: 'content/posts/url-navigation-process/images/img-6.png'
+image: './images/img-6.png'
 category: 计算机网络
 draft: false
 ---
@@ -185,7 +185,7 @@ HTTP 请求报文整体由请求行、请求头、空行、请求体四部分组
 
 ### 最终发给服务器的报文示例
 
-```Kotlin
+```bash
 POST /api/login HTTP/1.1
 Host: example.com
 User-Agent: Mozilla/5.0
