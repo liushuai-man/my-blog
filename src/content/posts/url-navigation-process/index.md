@@ -1,9 +1,9 @@
 ---
-title: 输入URL之后，都发生了什么
+title: 输入URL之后，都发生了什么？
 published: 2026-04-10
 description: '在浏览器中输入 URL 后，发生了哪些步骤？'
 tags: ['HTTP', 'URL', 'TCP']
-image: 'content\posts\url-navigation-process\images\img-6.png'
+image: 'content/posts/url-navigation-process/images/img-6.png'
 category: 计算机网络
 draft: false
 ---
