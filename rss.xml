@@ -1,4 +1,214 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>软弹适中</title><description>个人博客网站</description><link>https://liushuai-man.github.io/</link><templateTheme>Firefly</templateTheme><templateThemeVersion>0.0.0</templateThemeVersion><templateThemeUrl>https://github.com/CuteLeaf/Firefly</templateThemeUrl><lastBuildDate>2026年4月19日 17:02:30</lastBuildDate><item><title>Express + TypeScript 中“没有类型包”的解决方案</title><link>https://liushuai-man.github.io/my-blog/posts/node-express-typeerror/</link><guid isPermaLink="true">https://liushuai-man.github.io/my-blog/posts/node-express-typeerror/</guid><description>在 Node.js 中，使用 TypeScript 开发时，可能会遇到无类型包报错的问题。本文将介绍 3 种终极解决方案，帮助你解决这个问题。</description><pubDate>Sat, 18 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;section&gt;&lt;h2&gt;前言&lt;a href=&quot;#前言&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;在使用 Node.js + Express + TypeScript 开发后端项目时，很多人都会遇到一个经典问题：&lt;/p&gt;&lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;&lt;/figcaption&gt;&lt;pre&gt;&lt;code&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;1&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;❌ 无法找到模块的声明文件 / implicitly has an &apos;any&apos; type&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/code&gt;&lt;/pre&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/figure&gt;&lt;/div&gt;&lt;p&gt;尤其是在引入一些老库（比如 mysql、express 某些插件）时，这个问题几乎必现。&lt;/p&gt;&lt;p&gt;这篇文章会从原理 → 解决方案 → 更优实践，帮你彻底搞懂这个问题，而不是只会“装个 @types 就完事”。&lt;/p&gt;&lt;/section&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>软弹适中</title><description>个人博客网站</description><link>https://liushuai-man.github.io/</link><templateTheme>Firefly</templateTheme><templateThemeVersion>0.0.0</templateThemeVersion><templateThemeUrl>https://github.com/CuteLeaf/Firefly</templateThemeUrl><lastBuildDate>2026年4月25日 17:01:11</lastBuildDate><item><title>AI Agent 开发入门指南</title><link>https://liushuai-man.github.io/my-blog/posts/agent-start/</link><guid isPermaLink="true">https://liushuai-man.github.io/my-blog/posts/agent-start/</guid><description>一个简单的AI Agent入门指南，带你快速上手AI Agent的开发。</description><pubDate>Sat, 25 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;section&gt;&lt;h2&gt;前言&lt;a href=&quot;#前言&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;“Agent” 直译“代理人”的意思，是计算机、软件工程通用术语，早就存在，和 AI 无关。&lt;/p&gt;&lt;p&gt;随着AI的发展，Agent的概念被广泛应用于人工智能体系统中，AI Agent便诞生了。现在大部分Agent其实指的就是AI Agent。&lt;/p&gt;&lt;p&gt;但对于一个刚刚接触Agent的开发人员来说，Agent其实是一个比较复杂的概念。本文将为你提供一个简单的入门指南，带你快速上手Agent的开发。&lt;/p&gt;&lt;/section&gt;
+&lt;section&gt;&lt;h2&gt;AI Agent是什么&lt;a href=&quot;#ai-agent是什么&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;所以，AI Agent到底是什么呢？我们先来了解一下它的基础信息。&lt;/p&gt;&lt;section&gt;&lt;h3&gt;核心定义&lt;a href=&quot;#核心定义&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;AI Agent（人工智能智能体）：以大模型 LLM（Large Language Model，大语言模型）为核心，具备自主规划、环境感知、工具调用、记忆存储、循环迭代执行能力，以完成指定目标为核心的人工智能系统。区别于传统被动问答 AI，具备主动行动能力。&lt;/p&gt;&lt;/section&gt;&lt;section&gt;&lt;h3&gt;核心本质公式&lt;a href=&quot;#核心本质公式&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;(\boldsymbol{AI\ Agent = LLM + 规划 + 记忆 + 工具 + 环境交互})&lt;/p&gt;&lt;/section&gt;&lt;section&gt;&lt;h3&gt;五大核心能力&lt;a href=&quot;#五大核心能力&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;自主性&lt;/strong&gt;：无需人类逐指令引导，自主判断下一步行为&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;目标驱动&lt;/strong&gt;：接收最终任务，自动拆解子任务、闭环落地&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;感知能力&lt;/strong&gt;：接收外部信息（文本、接口数据、文件、环境状态）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;工具调用&lt;/strong&gt;：主动使用外部能力（搜索、代码、数据库、API、爬虫）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;反思迭代&lt;/strong&gt;：执行失败后自我纠错、调整方案，循环重试&lt;/li&gt;
+&lt;/ul&gt;&lt;/section&gt;&lt;section&gt;&lt;h3&gt;基础运行闭环（核心逻辑）&lt;a href=&quot;#基础运行闭环核心逻辑&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;感知环境 → LLM 推理思考 → 制定行动规划 → 调用工具执行 → 接收结果反馈 → 反思修正 → 持续循环直到任务完成 / 终止条件触发。&lt;/p&gt;&lt;/section&gt;&lt;section&gt;&lt;h3&gt;四大基础组成模块&lt;a href=&quot;#四大基础组成模块&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;大脑（推理层）&lt;/strong&gt;：LLM，负责理解、推理、决策、反思&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;规划层（Planning）&lt;/strong&gt;：任务拆分、步骤排序、策略制定&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;记忆层（Memory）&lt;/strong&gt;：短期上下文记忆、长期知识库、任务进度缓存&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;工具层（Tools）&lt;/strong&gt;：外部能力扩展，突破大模型固有局限&lt;/li&gt;
+&lt;/ul&gt;&lt;p&gt;&lt;img loading=&quot;lazy&quot; width=&quot;1215&quot; height=&quot;1295&quot; src=&quot;/my-blog/_astro/Image_01.CtZnNkoG_jGYJm.webp&quot; srcset=&quot;/my-blog/_astro/Image_01.CtZnNkoG_Z1jqECw.webp 640w, /my-blog/_astro/Image_01.CtZnNkoG_Z2soS3m.webp 750w, /my-blog/_astro/Image_01.CtZnNkoG_peeWE.webp 828w, /my-blog/_astro/Image_01.CtZnNkoG_1qR9EG.webp 1080w, /my-blog/_astro/Image_01.CtZnNkoG_jGYJm.webp 1215w&quot; /&gt;&lt;/p&gt;&lt;/section&gt;&lt;section&gt;&lt;h3&gt;关键区分：AI Agent vs 普通大模型&lt;a href=&quot;#关键区分ai-agent-vs-普通大模型&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;普通 LLM&lt;/strong&gt;：被动响应，一问一答，无执行链路，不会主动调用工具&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;AI Agent&lt;/strong&gt;：主动执行，多步串联、自主决策、复杂长任务落地&lt;/li&gt;
+&lt;/ul&gt;&lt;/section&gt;&lt;section&gt;&lt;h3&gt;一句话总结&lt;a href=&quot;#一句话总结&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;AI Agent 是一个以大模型 LLM 为核心，具备自主规划、环境感知、工具调用、记忆存储、循环迭代执行能力，以完成指定目标为核心的人工智能系统。&lt;/p&gt;&lt;/section&gt;&lt;/section&gt;
+&lt;section&gt;&lt;h2&gt;如何使用AI Agent&lt;a href=&quot;#如何使用ai-agent&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;我们了解了AI Agent的基本信息之后，那么我想问，我哪里会用的上它呢？其实也就是，AI Agent 的能满足的需求有哪些？&lt;/p&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;自动化任务&lt;/strong&gt;：如数据清洗、数据处理、数据可视化等，通过AI Agent可以实现自动执行，减少人工操作。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;复杂决策&lt;/strong&gt;：如金融交易、医疗诊断、法律分析等，AI Agent可以根据环境信息和工具能力，自主判断下一步行为。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;多任务协调&lt;/strong&gt;：如协调多个智能体合作完成任务，AI Agent可以实现任务的并行执行和协调。&lt;/li&gt;
+&lt;/ol&gt;&lt;section&gt;&lt;h3&gt;AI Agent 的应用最终形式&lt;a href=&quot;#ai-agent-的应用最终形式&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;当我知道它的基本信息、应用之后，开发之前，我还有一个问题，就是AI Agent最终应该以什么形式出现在用户面前？&lt;/p&gt;&lt;p&gt;其实有很多：&lt;/p&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;网页&lt;/strong&gt;：将AI Agent嵌入到网页中，用户可以在网页上与AI Agent进行交互。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;应用&lt;/strong&gt;：开发一个独立的应用，用户可以通过应用与AI Agent进行交互。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;机器人&lt;/strong&gt;：将AI Agent部署为一个机器人，用户可以通过机器人与AI Agent进行交互。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;语音助手&lt;/strong&gt;：将AI Agent部署为一个语音助手，用户可以通过语音与AI Agent进行交互。&lt;/li&gt;
+&lt;/ol&gt;&lt;p&gt;AI Agent作为一个系统，确实可以根据不同的需求和场景嵌入到各种形式中。&lt;/p&gt;&lt;/section&gt;&lt;/section&gt;
+&lt;section&gt;&lt;h2&gt;如何开发AI Agent&lt;a href=&quot;#如何开发ai-agent&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;ok,相信你已经了解了AI Agent的基本信息和应用场景。那么，我们来了解一下如何开发AI Agent。&lt;/p&gt;&lt;section&gt;&lt;h3&gt;架构设计&lt;a href=&quot;#架构设计&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;在开发AI Agent时，通常的架构设计需要包含以下几个主要组件：&lt;/p&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;推理层（大脑层）&lt;/strong&gt;：负责理解、推理、决策和反思。通常使用自然语言处理（NLP）和深度学习模型（如LLM，GPT等）来实现。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;规划层（Planning）&lt;/strong&gt;：负责任务拆分、步骤排序和策略制定，将大脑层的输出转化为具体的操作。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;记忆层（Memory）&lt;/strong&gt;：保存上下文、任务进度和长期知识。确保Agent在多轮交互或长时间操作下不丢失重要的信息。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;工具层（Tools）&lt;/strong&gt;：扩展Agent的外部能力，通常通过API调用或其他工具来执行复杂的任务，突破大模型固有的局限。&lt;/li&gt;
+&lt;/ul&gt;&lt;p&gt;&lt;strong&gt;推荐的整体架构&lt;/strong&gt;：&lt;/p&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;前端（UI层）&lt;/strong&gt;：用户与Agent的交互界面。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;后端（API层）&lt;/strong&gt;：处理所有AI逻辑、模型推理、数据存储等。
+&lt;ul&gt;
+&lt;li&gt;推理层：处理核心推理，调用大语言模型等。&lt;/li&gt;
+&lt;li&gt;规划层：任务拆解与执行策略。&lt;/li&gt;
+&lt;li&gt;记忆层：存储上下文和知识。&lt;/li&gt;
+&lt;li&gt;工具层：调用外部API或执行特定操作。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;&lt;/section&gt;&lt;section&gt;&lt;h3&gt;所需准备工作&lt;a href=&quot;#所需准备工作&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;在开发AI Agent项目之前，以下是需要学习和准备的知识和工具：&lt;/p&gt;&lt;p&gt;下面是一些市面上主流的技术栈：&lt;/p&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;类别&lt;/th&gt;&lt;th&gt;技术&lt;/th&gt;&lt;th&gt;用途&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;编程语言&lt;/td&gt;&lt;td&gt;Python, Node.js&lt;/td&gt;&lt;td&gt;Python：深度学习、机器学习、NLP； Node.js：Web应用开发&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;深度学习框架&lt;/td&gt;&lt;td&gt;TensorFlow, PyTorch, Hugging Face Transformers, LangChain&lt;/td&gt;&lt;td&gt;深度学习模型构建与推理，NLP任务，LLM集成（LangChain）&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;API框架&lt;/td&gt;&lt;td&gt;Flask, FastAPI, Express, GraphQL&lt;/td&gt;&lt;td&gt;构建API服务，处理HTTP请求，GraphQL用于复杂数据查询&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;数据库与存储&lt;/td&gt;&lt;td&gt;PostgreSQL, MySQL, MongoDB, Redis, Neo4j&lt;/td&gt;&lt;td&gt;存储任务数据、用户信息、知识库，缓存短期记忆，图数据库&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;任务调度与规划&lt;/td&gt;&lt;td&gt;RQ, Celery, OpenAI Gym, Stable Baselines&lt;/td&gt;&lt;td&gt;异步任务调度，强化学习，用于任务分解和策略生成&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;容器化与部署&lt;/td&gt;&lt;td&gt;Docker, Kubernetes, CI/CD工具（GitLab CI, Jenkins, GitHub Actions）&lt;/td&gt;&lt;td&gt;容器化应用，自动化部署与扩展，持续集成与部署&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;云平台&lt;/td&gt;&lt;td&gt;AWS, Google Cloud, Azure&lt;/td&gt;&lt;td&gt;云计算平台，托管模型与数据库，大规模计算资源&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;前端技术&lt;/td&gt;&lt;td&gt;React, Vue.js, Socket.io&lt;/td&gt;&lt;td&gt;前端框架，用于开发Web应用，Socket.io用于实时通信&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;安全性与认证&lt;/td&gt;&lt;td&gt;OAuth 2.0, JWT, HTTPS/SSL, 加密技术&lt;/td&gt;&lt;td&gt;API身份验证与授权，确保数据传输的安全性&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;section&gt;&lt;h4&gt;Node.js 项目案例&lt;a href=&quot;#nodejs-项目案例&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;创建项目并安装依赖&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;p&gt;首先，创建一个新的 Node.js 项目并安装所需的依赖：&lt;/p&gt;&lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;Terminal window&lt;/span&gt;&lt;/figcaption&gt;&lt;pre&gt;&lt;code&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;1&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;# 创建项目文件夹&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;2&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;mkdir&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;ai-agent-node&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;3&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;cd&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;ai-agent-node&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;4&lt;/div&gt;&lt;/div&gt;&lt;div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;5&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;# 初始化Node.js项目&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;6&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;npm&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;init&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;-y&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;7&lt;/div&gt;&lt;/div&gt;&lt;div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;8&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;# 安装必需的依赖&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;9&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;npm&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;install&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;express&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;langchain&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;openai&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;dotenv&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;body-parser&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;axios&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/code&gt;&lt;/pre&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/figure&gt;&lt;/div&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;项目目录结构&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;p&gt;初始化项目后，项目目录结构如下：&lt;/p&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;&lt;/figcaption&gt;&lt;pre&gt;&lt;code&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;1&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;ai-agent-node/&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;2&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;├── node_modules/           # Node.js依赖包&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;3&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;├── src/&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;4&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;│   ├── app.js              # 应用入口文件&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;5&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;│   ├── config.js           # 配置文件&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;6&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;│   ├── agent/              # AI代理相关逻辑&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;7&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;│   │   ├── agentController.js  # 代理控制器，处理请求&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;8&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;│   │   └── agentService.js    # 代理服务层，包含AI业务逻辑&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;9&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;│   ├── models/             # 用于存储模型相关逻辑（如大语言模型）&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;10&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;│   │   └── languageModel.js  # 与LangChain交互的代码&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;11&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;│   ├── routes/             # API路由文件夹&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;12&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;│   │   └── agentRoutes.js   # 定义与AI Agent交互的API&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;13&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;│   ├── utils/              # 工具类文件&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;14&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;│   │   └── apiUtils.js      # 封装API请求&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;15&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;│   ├── .env                # 环境变量配置&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;16&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;├── .gitignore              # 用于Git忽略文件&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;17&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;├── package.json            # 项目配置和依赖&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;18&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;└── package-lock.json       # 锁定依赖的版本&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/code&gt;&lt;/pre&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/figure&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;span&gt;展开&lt;/span&gt;&lt;span&gt;收起&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;目录结构介绍与文件功能&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;node_modules/&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;功能：包含安装的所有依赖库（如 express, langchain, dotenv 等），不需要直接操作。&lt;/li&gt;
+&lt;li&gt;为什么有这个目录：Node.js项目管理依赖的标准方式。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;src/&lt;/strong&gt;
+这是项目的主要代码目录，所有与功能实现相关的代码都放在此目录下。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;app.js&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;功能：应用的入口文件，负责启动Express服务器，配置路由，并初始化中间件。&lt;/li&gt;
+&lt;li&gt;为什么有这个文件：这是Node.js应用的标准入口文件，负责初始化应用和所有依赖，确保后端服务可以运行。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;&lt;/figcaption&gt;&lt;pre&gt;&lt;code&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;1&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;const&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;express&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;=&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;require&lt;/span&gt;&lt;span&gt;(&lt;/span&gt;&lt;span&gt;&apos;express&apos;&lt;/span&gt;&lt;span&gt;);&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;2&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;const&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;bodyParser&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;=&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;require&lt;/span&gt;&lt;span&gt;(&lt;/span&gt;&lt;span&gt;&apos;body-parser&apos;&lt;/span&gt;&lt;span&gt;);&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;3&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;const&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;agentRoutes&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;=&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;require&lt;/span&gt;&lt;span&gt;(&lt;/span&gt;&lt;span&gt;&apos;./routes/agentRoutes&apos;&lt;/span&gt;&lt;span&gt;);&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;4&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;const&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;app&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;=&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;express&lt;/span&gt;&lt;span&gt;();&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;5&lt;/div&gt;&lt;/div&gt;&lt;div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;6&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;// 使用body-parser中间件来解析JSON请求&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;7&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;&lt;span&gt;app&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;/span&gt;&lt;span&gt;use&lt;/span&gt;&lt;span&gt;&lt;span&gt;(&lt;/span&gt;&lt;span&gt;bodyParser&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;/span&gt;&lt;span&gt;json&lt;/span&gt;&lt;span&gt;());&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;8&lt;/div&gt;&lt;/div&gt;&lt;div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;9&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;// 配置路由&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;10&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;&lt;span&gt;app&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;/span&gt;&lt;span&gt;use&lt;/span&gt;&lt;span&gt;(&lt;/span&gt;&lt;span&gt;&apos;/api/agent&apos;&lt;/span&gt;&lt;span&gt;&lt;span&gt;, &lt;/span&gt;&lt;span&gt;agentRoutes&lt;/span&gt;&lt;span&gt;);&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;11&lt;/div&gt;&lt;/div&gt;&lt;div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;12&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;// 启动服务器&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;13&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;const&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;port&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;=&lt;/span&gt;&lt;span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;process&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;/span&gt;&lt;span&gt;env&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;PORT&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;||&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;3000&lt;/span&gt;&lt;span&gt;;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;14&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;&lt;span&gt;app&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;/span&gt;&lt;span&gt;listen&lt;/span&gt;&lt;span&gt;&lt;span&gt;(&lt;/span&gt;&lt;span&gt;port&lt;/span&gt;&lt;span&gt;, () &lt;/span&gt;&lt;/span&gt;&lt;span&gt;=&amp;gt;&lt;/span&gt;&lt;span&gt; {&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;15&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;&lt;span&gt;  &lt;/span&gt;&lt;/span&gt;&lt;span&gt;console&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;log&lt;/span&gt;&lt;span&gt;(&lt;/span&gt;&lt;span&gt;`Server running on port &lt;/span&gt;&lt;span&gt;${&lt;/span&gt;&lt;span&gt;port&lt;/span&gt;&lt;span&gt;}&lt;/span&gt;&lt;span&gt;`&lt;/span&gt;&lt;span&gt;);&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;16&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;});&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/code&gt;&lt;/pre&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/figure&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;span&gt;展开&lt;/span&gt;&lt;span&gt;收起&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;config.js&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;功能：存储应用配置，如环境变量、数据库连接信息、API密钥等。&lt;/li&gt;
+&lt;li&gt;为什么有这个文件：集中管理配置信息，便于项目维护和扩展，避免硬编码。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;&lt;/figcaption&gt;&lt;pre&gt;&lt;code&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;1&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;require&lt;/span&gt;&lt;span&gt;(&lt;/span&gt;&lt;span&gt;&apos;dotenv&apos;&lt;/span&gt;&lt;span&gt;).&lt;/span&gt;&lt;span&gt;config&lt;/span&gt;&lt;span&gt;();&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;2&lt;/div&gt;&lt;/div&gt;&lt;div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;3&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;module&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;exports&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;=&lt;/span&gt;&lt;span&gt; {&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;4&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;  &lt;/span&gt;&lt;span&gt;openaiApiKey&lt;/span&gt;&lt;span&gt;:&lt;/span&gt;&lt;span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;process&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;/span&gt;&lt;span&gt;env&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;OPENAI_API_KEY&lt;/span&gt;&lt;span&gt;, &lt;/span&gt;&lt;span&gt;// OpenAI API密钥&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;5&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;  &lt;/span&gt;&lt;span&gt;port&lt;/span&gt;&lt;span&gt;:&lt;/span&gt;&lt;span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;process&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;/span&gt;&lt;span&gt;env&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;PORT&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;||&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;3000&lt;/span&gt;&lt;span&gt;,&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;6&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;};&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/code&gt;&lt;/pre&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/figure&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;agent/&lt;/strong&gt;
+这个文件夹专门用于存放与AI代理（Agent）相关的业务逻辑和控制层代码。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;agentController.js&lt;/strong&gt;：处理接收到的请求，调用服务层（agentService.js）处理实际的业务逻辑，然后将结果返回给前端。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;agentService.js&lt;/strong&gt;：负责与LangChain或其他AI服务进行交互，处理具体的AI逻辑（如生成回复、任务规划等）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;models/&lt;/strong&gt;
+用于存储与模型相关的代码，通常包括与第三方AI平台（如OpenAI）的接口交互代码。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;languageModel.js&lt;/strong&gt;：集成LangChain或其他大语言模型（如GPT-3），为代理提供推理能力。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;routes/&lt;/strong&gt;
+路由层，负责定义API的端点和路径。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;agentRoutes.js&lt;/strong&gt;：定义与Agent相关的API路由，通常会映射到代理控制器（agentController.js）的方法。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;&lt;/figcaption&gt;&lt;pre&gt;&lt;code&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;1&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;const&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;express&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;=&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;require&lt;/span&gt;&lt;span&gt;(&lt;/span&gt;&lt;span&gt;&apos;express&apos;&lt;/span&gt;&lt;span&gt;);&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;2&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;const&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;router&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;=&lt;/span&gt;&lt;span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;express&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;/span&gt;&lt;span&gt;Router&lt;/span&gt;&lt;span&gt;();&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;3&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;const&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;agentController&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;=&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;require&lt;/span&gt;&lt;span&gt;(&lt;/span&gt;&lt;span&gt;&apos;../agent/agentController&apos;&lt;/span&gt;&lt;span&gt;);&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;4&lt;/div&gt;&lt;/div&gt;&lt;div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;5&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;// 定义POST请求路由，处理AI Agent查询&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;6&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;&lt;span&gt;router&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;/span&gt;&lt;span&gt;post&lt;/span&gt;&lt;span&gt;(&lt;/span&gt;&lt;span&gt;&apos;/query&apos;&lt;/span&gt;&lt;span&gt;&lt;span&gt;, &lt;/span&gt;&lt;span&gt;agentController&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;/span&gt;&lt;span&gt;queryAgent&lt;/span&gt;&lt;span&gt;);&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;7&lt;/div&gt;&lt;/div&gt;&lt;div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;8&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;module&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;exports&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;=&lt;/span&gt;&lt;span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;router&lt;/span&gt;&lt;span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/code&gt;&lt;/pre&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/figure&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;utils/&lt;/strong&gt;
+工具类文件，存放项目中常用的函数、API请求封装、格式化工具等。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;apiUtils.js&lt;/strong&gt;：封装API请求相关的工具函数，如与外部API交互的通用逻辑。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;.env&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;功能：存储环境变量，如API密钥、端口号等。&lt;/li&gt;
+&lt;li&gt;为什么有这个文件：确保敏感信息不暴露在代码中，使用.env进行管理可以让不同环境的配置更加灵活。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;&lt;/figcaption&gt;&lt;pre&gt;&lt;code&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;1&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;OPENAI_API_KEY=your_openai_api_key&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;2&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;PORT=3000&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/code&gt;&lt;/pre&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/figure&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;.gitignore&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;功能：指定Git需要忽略的文件或目录（如node_modules/、.env等）。&lt;/li&gt;
+&lt;li&gt;为什么有这个文件：避免将敏感信息或不必要的依赖上传到Git仓库。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;&lt;/figcaption&gt;&lt;pre&gt;&lt;code&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;1&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;node_modules/&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;2&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;.env&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/code&gt;&lt;/pre&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/figure&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;必要操作与补充&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;环境配置&lt;/strong&gt;：在本地开发时，确保.env文件中配置了正确的API密钥和端口号。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;运行项目&lt;/strong&gt;：确保在开发过程中可以使用&lt;code&gt;node app.js&lt;/code&gt;启动服务器。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;测试API&lt;/strong&gt;：你可以使用Postman等工具，向&lt;code&gt;POST /api/agent/query&lt;/code&gt;发送请求，并验证API的返回结果。&lt;/li&gt;
+&lt;/ul&gt;&lt;/section&gt;&lt;/section&gt;&lt;/section&gt;
+&lt;section&gt;&lt;h2&gt;总结&lt;a href=&quot;#总结&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;通过本文的学习，我们对AI Agent有了全面的了解：&lt;/p&gt;&lt;section&gt;&lt;h3&gt;核心概念&lt;a href=&quot;#核心概念&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;AI Agent是以大模型LLM为核心，具备自主规划、环境感知、工具调用、记忆存储、循环迭代执行能力的人工智能系统&lt;/li&gt;
+&lt;li&gt;核心本质公式：&lt;code&gt;AI Agent = LLM + 规划 + 记忆 + 工具 + 环境交互&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;区别于普通大模型，AI Agent具有主动执行能力，能够完成复杂的长任务&lt;/li&gt;
+&lt;/ul&gt;&lt;/section&gt;&lt;section&gt;&lt;h3&gt;应用场景&lt;a href=&quot;#应用场景&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;自动化任务&lt;/strong&gt;：如数据清洗、处理、可视化等&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;复杂决策&lt;/strong&gt;：如金融交易、医疗诊断、法律分析等&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;多任务协调&lt;/strong&gt;：协调多个智能体合作完成任务&lt;/li&gt;
+&lt;/ul&gt;&lt;/section&gt;&lt;section&gt;&lt;h3&gt;开发要点&lt;a href=&quot;#开发要点&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;架构设计&lt;/strong&gt;：包含推理层、规划层、记忆层、工具层等核心组件&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;技术栈&lt;/strong&gt;：Python/Node.js、深度学习框架、API框架、数据库、容器化技术等&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;项目结构&lt;/strong&gt;：合理组织代码，分离关注点，提高可维护性&lt;/li&gt;
+&lt;/ul&gt;&lt;/section&gt;&lt;section&gt;&lt;h3&gt;实践步骤&lt;a href=&quot;#实践步骤&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;初始化项目并安装必要依赖&lt;/li&gt;
+&lt;li&gt;设计合理的目录结构&lt;/li&gt;
+&lt;li&gt;实现核心功能模块&lt;/li&gt;
+&lt;li&gt;配置环境变量和部署策略&lt;/li&gt;
+&lt;/ul&gt;&lt;p&gt;AI Agent作为人工智能的重要发展方向，正在各个领域展现出巨大的潜力。通过本文提供的入门指南，希望你能够快速上手AI Agent的开发，探索更多可能性。&lt;/p&gt;&lt;p&gt;随着技术的不断进步，AI Agent的能力将不断增强，为我们的工作和生活带来更多便利。期待你在AI Agent领域的创新和贡献！&lt;/p&gt;&lt;/section&gt;&lt;/section&gt;</content:encoded></item><item><title>Express + TypeScript 中“没有类型包”的解决方案</title><link>https://liushuai-man.github.io/my-blog/posts/node-express-typeerror/</link><guid isPermaLink="true">https://liushuai-man.github.io/my-blog/posts/node-express-typeerror/</guid><description>在 Node.js 中，使用 TypeScript 开发时，可能会遇到无类型包报错的问题。本文将介绍 3 种终极解决方案，帮助你解决这个问题。</description><pubDate>Sat, 18 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;section&gt;&lt;h2&gt;前言&lt;a href=&quot;#前言&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;在使用 Node.js + Express + TypeScript 开发后端项目时，很多人都会遇到一个经典问题：&lt;/p&gt;&lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;&lt;/figcaption&gt;&lt;pre&gt;&lt;code&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;1&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;❌ 无法找到模块的声明文件 / implicitly has an &apos;any&apos; type&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/code&gt;&lt;/pre&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/figure&gt;&lt;/div&gt;&lt;p&gt;尤其是在引入一些老库（比如 mysql、express 某些插件）时，这个问题几乎必现。&lt;/p&gt;&lt;p&gt;这篇文章会从原理 → 解决方案 → 更优实践，帮你彻底搞懂这个问题，而不是只会“装个 @types 就完事”。&lt;/p&gt;&lt;/section&gt;
 &lt;section&gt;&lt;h2&gt;一、问题根源&lt;a href=&quot;#一问题根源&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;首先，我们大家都知道TypeScript 所带来的收益是非常大的：&lt;/p&gt;&lt;ul&gt;
 &lt;li&gt;✅ 提前发现错误（编译期）&lt;/li&gt;
 &lt;li&gt;✅ 更好的代码提示（IDE 体验提升）&lt;/li&gt;
@@ -212,7 +422,7 @@ utils/&lt;/p&gt;&lt;p&gt;尤其是：单独维护 types/ 目录&lt;/p&gt;&lt;/se
 &lt;li&gt;避免使用 JSONP，存在安全风险，且功能有限。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;/ol&gt;&lt;p&gt;掌握以上内容，就能解决前端开发中 99% 的跨域问题，无论是面试还是实际项目，都能轻松应对。&lt;/p&gt;&lt;/section&gt;</content:encoded></item><item><title>输入URL之后，都发生了什么</title><link>https://liushuai-man.github.io/my-blog/posts/url-navigation-process/</link><guid isPermaLink="true">https://liushuai-man.github.io/my-blog/posts/url-navigation-process/</guid><description>在浏览器中输入 URL 后，发生了哪些步骤？</description><pubDate>Fri, 10 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;section&gt;&lt;h2&gt;前言&lt;a href=&quot;#前言&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;当我们在浏览器导航栏输入URL之后，按下回车enter就会跳转到这个页面。&lt;/p&gt;&lt;p&gt;从输入URL开始，后面都发生了什么？&lt;/p&gt;&lt;/section&gt;
+&lt;/ol&gt;&lt;p&gt;掌握以上内容，就能解决前端开发中 99% 的跨域问题，无论是面试还是实际项目，都能轻松应对。&lt;/p&gt;&lt;/section&gt;</content:encoded></item><item><title>输入URL之后，都发生了什么？</title><link>https://liushuai-man.github.io/my-blog/posts/url-navigation-process/</link><guid isPermaLink="true">https://liushuai-man.github.io/my-blog/posts/url-navigation-process/</guid><description>在浏览器中输入 URL 后，发生了哪些步骤？</description><pubDate>Fri, 10 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;section&gt;&lt;h2&gt;前言&lt;a href=&quot;#前言&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;当我们在浏览器导航栏输入URL之后，按下回车enter就会跳转到这个页面。&lt;/p&gt;&lt;p&gt;从输入URL开始，后面都发生了什么？&lt;/p&gt;&lt;/section&gt;
 &lt;section&gt;&lt;h2&gt;一、URL解析&lt;a href=&quot;#一url解析&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;浏览器第一步会对输入的 URL 进行结构化拆解，明确请求的协议、目标服务器、资源位置等关键信息，这是整个网络流程的起点。&lt;/p&gt;&lt;p&gt;比如：&lt;a href=&quot;https://www.example.com:8080/blog/article?id=123&amp;amp;page=2#comment-456&quot; target=&quot;_blank&quot;&gt;https://www.example.com:8080/blog/article?id=123&amp;amp;page=2#comment-456&lt;/a&gt;&lt;/p&gt;
 
 
@@ -412,8 +622,8 @@ utils/&lt;/p&gt;&lt;p&gt;尤其是：单独维护 types/ 目录&lt;/p&gt;&lt;/se
 
 
 
-&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;字段&lt;/th&gt;&lt;th&gt;示例&lt;/th&gt;&lt;th&gt;说明&lt;/th&gt;&lt;th&gt;通俗理解&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;Host&lt;/td&gt;&lt;td&gt;example.com&lt;/td&gt;&lt;td&gt;请求目标主机&lt;/td&gt;&lt;td&gt;告诉服务器你要访问哪一个网站。&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;User-Agent&lt;/td&gt;&lt;td&gt;Mozilla/5.0&lt;/td&gt;&lt;td&gt;客户端信息&lt;/td&gt;&lt;td&gt;告诉服务器你用的是什么客户端。&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Accept&lt;/td&gt;&lt;td&gt;application/json&lt;/td&gt;&lt;td&gt;希望返回的数据类型&lt;/td&gt;&lt;td&gt;告诉服务器我希望你返回什么格式的数据给我。&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Authorization&lt;/td&gt;&lt;td&gt;Bearer token&lt;/td&gt;&lt;td&gt;携带认证信息&lt;/td&gt;&lt;td&gt;身份凭证，告诉服务器 “我是谁，我已经登录了”。&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Cookie&lt;/td&gt;&lt;td&gt;userId=100&lt;/td&gt;&lt;td&gt;携带 Cookie&lt;/td&gt;&lt;td&gt;把服务器之前存在你浏览器里的小数据再带回给服务器。&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Content-Type&lt;/td&gt;&lt;td&gt;application/json&lt;/td&gt;&lt;td&gt;请求体格式&lt;/td&gt;&lt;td&gt;告诉服务器我传给你的请求体是什么格式。&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Referer&lt;/td&gt;&lt;td&gt;&lt;a href=&quot;https://google.com&quot; target=&quot;_blank&quot;&gt;https://google.com&lt;/a&gt;&lt;/td&gt;&lt;td&gt;来源页面（防盗链）&lt;/td&gt;&lt;td&gt;告诉服务器我是从哪个页面跳过来的。&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;p&gt;这些请求头不是每个请求都必须带，而是浏览器 / 客户端根据场景自动决定要不要加，只有需要时才会出现，其中Host基本是必带的。&lt;/p&gt;&lt;/section&gt;&lt;/section&gt;&lt;section&gt;&lt;h4&gt;空行&lt;a href=&quot;#空行&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;必须有，用来隔开请求头和请求体，告诉服务器 “头信息结束了”&lt;/p&gt;&lt;/section&gt;&lt;section&gt;&lt;h4&gt;请求体(Body，可选)&lt;a href=&quot;#请求体body可选&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;放要传给服务器的数据、登录、发帖子这种 POST 请求，作为参数的账号密码 / 内容放这里&lt;/p&gt;&lt;/section&gt;&lt;/section&gt;&lt;section&gt;&lt;h3&gt;最终发给服务器的报文示例&lt;a href=&quot;#最终发给服务器的报文示例&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;&lt;/figcaption&gt;&lt;pre&gt;&lt;code&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;1&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;POST /api/login HTTP/1.1&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;2&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;Host: example.com&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;3&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;User-Agent: Mozilla/5.0&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;4&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;Content-Type: application/json&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;5&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;Content-Length: 35&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;6&lt;/div&gt;&lt;/div&gt;&lt;div&gt;
-&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;7&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;{&quot;username&quot;: &quot;Ryne&quot;, &quot;password&quot;: &quot;123&quot;}&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/code&gt;&lt;/pre&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/figure&gt;&lt;/div&gt;&lt;/section&gt;&lt;/section&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;字段&lt;/th&gt;&lt;th&gt;示例&lt;/th&gt;&lt;th&gt;说明&lt;/th&gt;&lt;th&gt;通俗理解&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;Host&lt;/td&gt;&lt;td&gt;example.com&lt;/td&gt;&lt;td&gt;请求目标主机&lt;/td&gt;&lt;td&gt;告诉服务器你要访问哪一个网站。&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;User-Agent&lt;/td&gt;&lt;td&gt;Mozilla/5.0&lt;/td&gt;&lt;td&gt;客户端信息&lt;/td&gt;&lt;td&gt;告诉服务器你用的是什么客户端。&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Accept&lt;/td&gt;&lt;td&gt;application/json&lt;/td&gt;&lt;td&gt;希望返回的数据类型&lt;/td&gt;&lt;td&gt;告诉服务器我希望你返回什么格式的数据给我。&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Authorization&lt;/td&gt;&lt;td&gt;Bearer token&lt;/td&gt;&lt;td&gt;携带认证信息&lt;/td&gt;&lt;td&gt;身份凭证，告诉服务器 “我是谁，我已经登录了”。&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Cookie&lt;/td&gt;&lt;td&gt;userId=100&lt;/td&gt;&lt;td&gt;携带 Cookie&lt;/td&gt;&lt;td&gt;把服务器之前存在你浏览器里的小数据再带回给服务器。&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Content-Type&lt;/td&gt;&lt;td&gt;application/json&lt;/td&gt;&lt;td&gt;请求体格式&lt;/td&gt;&lt;td&gt;告诉服务器我传给你的请求体是什么格式。&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Referer&lt;/td&gt;&lt;td&gt;&lt;a href=&quot;https://google.com&quot; target=&quot;_blank&quot;&gt;https://google.com&lt;/a&gt;&lt;/td&gt;&lt;td&gt;来源页面（防盗链）&lt;/td&gt;&lt;td&gt;告诉服务器我是从哪个页面跳过来的。&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;p&gt;这些请求头不是每个请求都必须带，而是浏览器 / 客户端根据场景自动决定要不要加，只有需要时才会出现，其中Host基本是必带的。&lt;/p&gt;&lt;/section&gt;&lt;/section&gt;&lt;section&gt;&lt;h4&gt;空行&lt;a href=&quot;#空行&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;必须有，用来隔开请求头和请求体，告诉服务器 “头信息结束了”&lt;/p&gt;&lt;/section&gt;&lt;section&gt;&lt;h4&gt;请求体(Body，可选)&lt;a href=&quot;#请求体body可选&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;放要传给服务器的数据、登录、发帖子这种 POST 请求，作为参数的账号密码 / 内容放这里&lt;/p&gt;&lt;/section&gt;&lt;/section&gt;&lt;section&gt;&lt;h3&gt;最终发给服务器的报文示例&lt;a href=&quot;#最终发给服务器的报文示例&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;Terminal window&lt;/span&gt;&lt;/figcaption&gt;&lt;pre&gt;&lt;code&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;1&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;POST&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;/api/login&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;HTTP/1.1&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;2&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;Host:&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;example.com&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;3&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;User-Agent:&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;Mozilla/5.0&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;4&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;Content-Type:&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;application/json&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;5&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;Content-Length:&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;35&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;6&lt;/div&gt;&lt;/div&gt;&lt;div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;7&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;{&lt;/span&gt;&lt;span&gt;&quot;username&quot;&lt;/span&gt;&lt;span&gt;:&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;&quot;Ryne&quot;,&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;&quot;password&quot;:&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;&quot;123&quot;}&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/code&gt;&lt;/pre&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/figure&gt;&lt;/div&gt;&lt;/section&gt;&lt;/section&gt;
 &lt;section&gt;&lt;h2&gt;六、服务器响应（HTTP响应报文）&lt;a href=&quot;#六服务器响应http响应报文&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;经过TCP传输 服务器收到浏览器的 HTTP 请求后，会解析请求、执行业务逻辑（如验证登录账号密码），处理完成后返回HTTP 响应报文，告知浏览器请求的处理结果。&lt;/p&gt;&lt;p&gt;HTTPS 场景下该报文同样会经 TLS 加密后传输，浏览器接收后先解密再解析。&lt;/p&gt;&lt;section&gt;&lt;h3&gt;HTTP响应报文（Response）的组成&lt;a href=&quot;#http响应报文response的组成&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;&lt;section&gt;&lt;h4&gt;状态行&lt;a href=&quot;#状态行&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;表示请求处理的结果（HTTP版本 + 状态码 + 状态描述）&lt;/p&gt;&lt;p&gt;示例：&lt;/p&gt;&lt;p&gt;&lt;code&gt;HTTP/1.1 200 OK&lt;/code&gt; &lt;code&gt;HTTP/1.1 404 Not Found&lt;/code&gt;&lt;/p&gt;&lt;section&gt;&lt;h6&gt;状态码&lt;a href=&quot;#状态码&quot;&gt;&lt;span&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/h6&gt;&lt;p&gt;按类别：&lt;/p&gt;
 
 
